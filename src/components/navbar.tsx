@@ -1,17 +1,9 @@
 import Link from "next/link";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "./ui/navigation-menu";
-import { CrazyLogo, Logo } from "./ui/logo";
-import { Button, buttonVariants } from "./ui/button";
-import { useSession } from "next-auth/react";
+import { Logo } from "./ui/logo";
+import { buttonVariants } from "./ui/button";
 import { NavLink } from "./ui/navlink";
-import { Spinner } from "./ui/spinner";
 import { AccountButton } from "./account-button";
+import { User } from "next-auth";
 
 const components: { title: string; href: string }[] = [
   {
@@ -24,9 +16,7 @@ const components: { title: string; href: string }[] = [
   },
 ];
 
-export function NavBar() {
-  const { status, data } = useSession();
-
+export function NavBar({ user }: { user: User | null }) {
   return (
     <header className="h-16 fixed inset-x-0 top-0 border-b border-b-border backdrop-blur-lg bg-background/40 flex items-center px-5 sm:px-10 lg:px-20">
       <Logo className="text-lg mr-10" />
@@ -43,14 +33,12 @@ export function NavBar() {
         ))}
       </nav>
       <span className="flex-1" />
-      {status === "loading" ? (
-        <Spinner className="h-6 w-6" />
-      ) : status === "unauthenticated" ? (
+      {user ? (
+        <AccountButton user={user} />
+      ) : (
         <Link href="/auth/log-in" className={buttonVariants()}>
           Log in
         </Link>
-      ) : (
-        <AccountButton user={data!.user!} />
       )}
     </header>
   );

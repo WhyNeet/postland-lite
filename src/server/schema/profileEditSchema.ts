@@ -25,4 +25,11 @@ export const profileEditSchema = z.object({
         return false;
       }
     }),
+  bio: z
+    .string()
+    .trim()
+    .min(1, "Bio is too short.")
+    .max(200, "Bio is too long.")
+    .optional()
+    .nullable(),
 });

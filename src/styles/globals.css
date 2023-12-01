@@ -57,6 +57,11 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  div[contenteditable]:empty::before {
+    content: "What's on your mind?";
+    @apply text-muted-foreground h-full
+  }
 }
 
 @layer utilities {

@@ -5,7 +5,7 @@ import { privateProcedure, publicProcedure, router } from "../trpc";
 export const postsRouter = router({
   getList: publicProcedure
     .input(getPostsSchema)
-    .query(async ({ input: { offset, perPage }, ctx: { prisma } }) => {
+    .query(async ({ input: { offset, perPage }, ctx: { prisma, session } }) => {
       const posts = await prisma.post.findMany({
         skip: offset,
         take: perPage,
@@ -17,6 +17,8 @@ export const postsRouter = router({
               username: true,
               name: true,
               image: true,
+              bio: true,
+              createdAt: true,
             },
           },
           _count: {
@@ -25,6 +27,14 @@ export const postsRouter = router({
               comments: true,
             },
           },
+        },
+        where: {
+          OR: [
+            {
+              isDraft: false,
+            },
+            { authorId: session?.user.id },
+          ],
         },
       });
 

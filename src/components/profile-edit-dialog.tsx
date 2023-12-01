@@ -28,7 +28,7 @@ export const ProfileEditDialog = ({
   username,
   imageUrl,
   updatePreview,
-}: z.infer<typeof profileEditSchema> & {
+}: Omit<z.infer<typeof profileEditSchema>, "bio"> & {
   updatePreview?: (data: z.infer<typeof profileEditSchema>) => void;
 }) => {
   const { toast } = useToast();

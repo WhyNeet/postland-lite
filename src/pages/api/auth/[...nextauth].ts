@@ -33,6 +33,7 @@ export const authOptions: AuthOptions = {
       if (session.user) {
         session.user.id = user.id;
         session.user.username = (user as any).username;
+        session.user.bio = (user as any).bio;
       }
 
       return session;

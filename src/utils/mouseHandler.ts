@@ -1,4 +1,4 @@
-export const mouseHandler = (e: MouseEvent, card: HTMLElement) => {
+export const mouseHandler = (card: HTMLElement, e: MouseEvent) => {
   if (card.matches(":hover")) {
     const rect = card.getBoundingClientRect();
     card.style.setProperty("--mouse-x", e.clientX - rect.x - 40 + "px");

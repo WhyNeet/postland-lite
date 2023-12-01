@@ -7,13 +7,23 @@ export const userRouter = router({
     .input(profileEditSchema)
     .mutation(async ({ input, ctx: { prisma, session } }) => {
       try {
+        const data =
+          input.bio === undefined
+            ? {
+                name: input.name,
+                username: input.username,
+                image: input.imageUrl,
+              }
+            : {
+                name: input.name,
+                username: input.username,
+                image: input.imageUrl,
+                bio: input.bio,
+              };
+
         await prisma.user.update({
           where: { id: session?.user.id },
-          data: {
-            name: input.name,
-            username: input.username,
-            image: input.imageUrl,
-          },
+          data,
         });
       } catch (e: any) {
         if (e?.meta && e.meta?.target && e.meta.target[0] === "username")
