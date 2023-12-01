@@ -3,12 +3,12 @@ import { CrazyLogo } from "@/components/ui/logo";
 import { ProviderLogo } from "@/components/logos";
 import Head from "next/head";
 import { ClientSafeProvider, getProviders, signIn } from "next-auth/react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 
-export const getStaticProps = (async (context) => {
+export const getServerSideProps = (async (context) => {
   const providers = await getProviders();
   return { props: { providers: Object.values(providers!) } };
-}) satisfies GetStaticProps<{
+}) satisfies GetServerSideProps<{
   providers: ClientSafeProvider[];
 }>;
 
