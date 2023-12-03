@@ -77,4 +77,12 @@
       box-shadow 300ms,
       transform 75ms;
   }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+body {
+  @apply scrollbar-none
 }

@@ -1,58 +1,75 @@
+import { appRouter } from "@/server/routers/_app";
+import { transformer } from "@/utils/transformer";
+import { trpc } from "@/utils/trpc";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]";
+import { prisma } from "@/utils/prisma";
 import { NavBar } from "@/components/navbar";
 import Head from "next/head";
-import { InfinitePostsList } from "@/components/posts-list";
-import { text } from "@/components/ui/typography";
-import { trpc } from "@/utils/trpc";
 import { CreatePost } from "@/components/create-post";
-import {
-  type GetServerSidePropsContext,
-  type InferGetServerSidePropsType,
-} from "next";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import { appRouter } from "@/server/routers/_app";
-import { prisma } from "@/utils/prisma";
-import { transformer } from "@/utils/transformer";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
+import { InfinitePostsList } from "@/components/posts-list";
+import { useRouter } from "next/router";
+import { PostCard } from "@/components/post-card";
+import { useEffect } from "react";
 
 export async function getServerSideProps({
+  query,
   req,
   res,
 }: GetServerSidePropsContext) {
   const session = await getServerSession(req, res, authOptions);
 
+  const rootPostId = query.ids!.at(-1)!;
+
   const helpers = createServerSideHelpers({
     router: appRouter,
-    ctx: { session, prisma },
     transformer,
+    ctx: { prisma, session },
   });
 
-  await helpers.post.getList.prefetchInfinite(
-    {
-      cursor: 0,
-      take: 20,
-    },
-    { context: { session, prisma } }
-  );
+  await helpers.post.getList.prefetch({
+    cursor: 0,
+    take: 20,
+    rootPost: rootPostId,
+  });
+
+  await helpers.post.getById.prefetch({ id: rootPostId });
 
   return {
-    props: { user: session?.user ?? null, trpcState: helpers.dehydrate() },
+    props: {
+      trpcState: helpers.dehydrate(),
+      user: session?.user ?? null,
+      rootPostId,
+    },
   };
 }
 
-export default function Home({
+export default function PostFeed({
   user,
+  rootPostId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const router = useRouter();
+
+  const { data: rootPost, refetch: refetchRoot } = trpc.post.getById.useQuery({
+    id: router.query.ids ? router.query.ids.at(-1)! : rootPostId,
+  });
+
   const {
     data: posts,
     refetch,
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
+    isError,
   } = trpc.post.getList.useInfiniteQuery(
-    { take: 20 },
+    {
+      take: 20,
+      rootPost: router.query.ids ? router.query.ids.at(-1)! : rootPostId,
+    },
     {
       getNextPageParam: (_, all) => {
         if (all.at(-1)?.length === 0) return undefined;
@@ -62,15 +79,25 @@ export default function Home({
     }
   );
 
+  useEffect(() => {
+    if (isError || !rootPost) router.replace("/");
+  }, [posts, isError, rootPost, router]);
+
   return (
-    <>
+    <div>
       <Head>
         <title>postland</title>
       </Head>
       <NavBar user={user} />
       <div className="px-5 sm:px-10 lg:px-20 py-24 max-w-7xl mx-auto">
+        <PostCard
+          post={rootPost!}
+          deletePost={() => router.replace("/")}
+          userId={user?.id ?? null}
+        />
+        <div className="h-6 w-full"></div>
         {user ? (
-          <CreatePost user={user} onCreate={refetch} />
+          <CreatePost replyTo={rootPostId} user={user} onCreate={refetch} />
         ) : (
           <div className="p-4 border border-border rounded-xl bg-secondary flex">
             <div>
@@ -94,6 +121,6 @@ export default function Home({
           userId={user?.id ?? null}
         />
       </div>
-    </>
+    </div>
   );
 }

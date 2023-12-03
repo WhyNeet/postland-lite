@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { profileEditSchema } from "../schema/profileEditSchema";
-import { privateProcedure, router } from "../trpc";
+import { privateProcedure, publicProcedure, router } from "../trpc";
+import { z } from "zod";
 
 export const userRouter = router({
   update: privateProcedure
@@ -12,12 +13,12 @@ export const userRouter = router({
             ? {
                 name: input.name,
                 username: input.username,
-                image: input.imageUrl,
+                image: input.image,
               }
             : {
                 name: input.name,
                 username: input.username,
-                image: input.imageUrl,
+                image: input.image,
                 bio: input.bio,
               };
 
@@ -38,5 +39,37 @@ export const userRouter = router({
       }
 
       return { message: "Profile updated." };
+    }),
+
+  follow: privateProcedure
+    .input(
+      z.object({
+        id: z.string().cuid("Id provided is not a CUID"),
+        isFollowing: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx: { session, prisma }, input }) => {
+      try {
+        if (input.isFollowing)
+          await prisma.follower.create({
+            data: { followerId: session.user.id, followingId: input.id },
+          });
+        else
+          await prisma.follower.delete({
+            where: {
+              followerId_followingId: {
+                followerId: session.user.id,
+                followingId: input.id,
+              },
+            },
+          });
+      } catch (e) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You are already following/unfollowed this user.",
+        });
+      }
+
+      return input.isFollowing;
     }),
 });

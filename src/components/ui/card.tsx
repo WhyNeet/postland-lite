@@ -83,6 +83,18 @@ export {
   CardContent,
 };
 
+export const TiltCard = ({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <TiltCard className={cn("card", className)} {...props}>
+      {children}
+    </TiltCard>
+  );
+};
+
 export const HoverCard = ({
   className,
   children,
@@ -104,12 +116,14 @@ export const HoverCard = ({
     <Card
       ref={card}
       className={cn(
-        "w-[350px] relative card overflow-hidden before:absolute before:-z-10 before:pointer-events-none before:top-[var(--mouse-y)] before:left-[var(--mouse-x)] before:h-20 before:w-20 before:rounded-full before:blur-2xl before:bg-primary",
+        "relative bg-transparent overflow-hidden before:absolute before:-z-10 before:pointer-events-none before:top-[var(--mouse-y)] before:left-[var(--mouse-x)] before:h-20 before:w-20 before:rounded-full before:blur-2xl before:bg-primary",
         className
       )}
       {...props}
     >
-      <div className="m-[1px] rounded-xl bg-background/80">{children}</div>
+      <div className="m-[1px] rounded-xl bg-background/80 h-full">
+        {children}
+      </div>
     </Card>
   );
 };

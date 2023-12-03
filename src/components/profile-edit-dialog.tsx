@@ -1,7 +1,6 @@
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -22,14 +21,14 @@ import { profileEditSchema } from "@/server/schema/profileEditSchema";
 import { object } from "@/utils/validation";
 import { useToast } from "./ui/use-toast";
 import { cn } from "@/utils";
+import { Session } from "next-auth";
 
 export const ProfileEditDialog = ({
-  name,
-  username,
-  imageUrl,
+  user,
   updatePreview,
-}: Omit<z.infer<typeof profileEditSchema>, "bio"> & {
+}: {
   updatePreview?: (data: z.infer<typeof profileEditSchema>) => void;
+  user: Session["user"];
 }) => {
   const { toast } = useToast();
 
@@ -50,7 +49,11 @@ export const ProfileEditDialog = ({
     watch,
   } = useForm<z.infer<typeof profileEditSchema>>({
     resolver: zodResolver(profileEditSchema),
-    defaultValues: { name, username, imageUrl },
+    defaultValues: {
+      name: user.name ?? "",
+      username: user.username,
+      image: user.image,
+    },
   });
 
   const fields: ProfileEditFieldData[] = [
@@ -67,16 +70,17 @@ export const ProfileEditDialog = ({
       error: errors.username?.message,
     },
     {
-      name: "imageUrl",
+      name: "image",
       label: "Avatar URL",
-      registerProps: register("imageUrl"),
-      error: errors.imageUrl?.message,
+      registerProps: register("image"),
+      error: errors.image?.message,
     },
   ];
 
   const onSubmit: SubmitHandler<z.infer<typeof profileEditSchema>> = async (
     data
   ) => {
+    console.log("update");
     await updateUserAsync(data)
       .then(() => {
         setIsOpen(false);
@@ -89,13 +93,18 @@ export const ProfileEditDialog = ({
 
   useEffect(() => {
     const sub = watch((values) => {
-      if (object.equal({ name, username, imageUrl }, values))
+      if (
+        object.equal(
+          { name: user.name, username: user.username, image: user.image },
+          values
+        )
+      )
         setIsChanged(false);
       else setIsChanged(true);
     });
 
     return () => sub.unsubscribe();
-  }, []);
+  }, [user, watch]);
 
   const [isOpen, setIsOpen] = useState(false);
 

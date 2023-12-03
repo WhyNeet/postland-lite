@@ -1,46 +1,47 @@
 import { AccountButton } from "./account-button";
-import { User } from "next-auth";
+import { Session } from "next-auth";
 import { Button } from "./ui/button";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { trpc } from "@/utils/trpc";
 import { useToast } from "./ui/use-toast";
 import { EyeNoneIcon } from "@radix-ui/react-icons";
 import { Toggle } from "./ui/toggle";
 import { Progress } from "./ui/progress";
+import { Spinner } from "./ui/spinner";
+import { TextArea } from "./ui/textarea";
 
 const maxChars = 1000;
 
-export const CreatePost = ({ user }: { user: User }) => {
+export const CreatePost = ({
+  user,
+  onCreate,
+  replyTo,
+}: {
+  user: Session["user"];
+  onCreate?: () => void;
+  replyTo?: string;
+}) => {
   const { toast } = useToast();
 
   const [content, setContent] = useState("");
   const [isDraft, setIsDraft] = useState(false);
 
-  const inputRef = useRef<HTMLTextAreaElement | null>(null);
-
   const { mutateAsync, isLoading } = trpc.post.create.useMutation({
     onSuccess() {
       toast({ description: "Post created." });
+      onCreate?.();
     },
   });
-
-  useEffect(() => {
-    if (!inputRef.current) return;
-    inputRef.current.style.height = "0px";
-    const scrollHeight = inputRef.current.scrollHeight;
-    inputRef.current.style.height = scrollHeight + "px";
-  }, [content]);
 
   return (
     <div className="w-full border-b border-b-border pb-2 flex">
       <AccountButton user={user} className="mr-4" />
       <div className="w-full">
-        <textarea
+        <TextArea
           placeholder="What's on your mind?"
-          ref={inputRef}
-          className="bg-transparent w-full outline-none mb-4 resize-none text-[15px]"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
+          content={content}
+          onChange={(e) => setContent(e.currentTarget.value)}
+          className="text-[15px] mb-4"
         />
         <div className="w-full flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -69,10 +70,16 @@ export const CreatePost = ({ user }: { user: User }) => {
                 content.trim().length > 1000
               }
               onClick={() =>
-                mutateAsync({ content, isDraft, parentPostId: null })
+                mutateAsync({ content, isDraft, parentPostId: replyTo })
               }
             >
-              {isDraft ? "Draft" : "Post"}
+              {isLoading ? (
+                <Spinner className="h-5 w-5" />
+              ) : isDraft ? (
+                "Draft"
+              ) : (
+                "Post"
+              )}
             </Button>
           </div>
         </div>

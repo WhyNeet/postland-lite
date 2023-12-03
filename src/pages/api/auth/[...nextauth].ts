@@ -12,14 +12,15 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       profile(profile) {
         return {
-          username: profile.username ?? profile.email.split("@")[0],
+          username: (profile.username ?? profile.email.split("@")[0]).slice(
+            0,
+            33
+          ),
           id: profile.sub,
           email: profile.email,
           emailVerified: profile.email_verified,
           image: profile.picture,
-          name:
-            profile.given_name +
-            (profile.family_name ? " " + profile.family_name : ""),
+          name: profile.given_name,
         };
       },
     }),

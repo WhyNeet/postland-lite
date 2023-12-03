@@ -54,7 +54,20 @@ model User {
   posts Post[]
   likes Like[]
 
+  following Follower[] @relation("Following")
+  followers Follower[] @relation("Followers")
+
   createdAt DateTime @default(now())
+}
+
+model Follower {
+  followerId String
+  follower   User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+
+  followingId String
+  following   User   @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
 }
 
 model VerificationToken {
@@ -73,7 +86,7 @@ model Post {
   content String @db.VarChar(1000)
 
   parentPostId String?
-  parentPost   Post?   @relation("PostToPost", fields: [parentPostId], references: [id])
+  parentPost   Post?   @relation("PostToPost", fields: [parentPostId], references: [id], onDelete: Cascade)
   comments     Post[]  @relation("PostToPost")
 
   likes Like[]

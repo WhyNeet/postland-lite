@@ -12,7 +12,7 @@ export const profileEditSchema = z.object({
     .min(2, "Username is too short.")
     .max(32, "Username is too long.")
     .refine((value) => /^[a-z0-9_.-]{2,32}$/gi.test(value)),
-  imageUrl: z
+  image: z
     .string()
     .nullable()
     .refine((val) => {
@@ -30,6 +30,7 @@ export const profileEditSchema = z.object({
     .trim()
     .min(1, "Bio is too short.")
     .max(200, "Bio is too long.")
+    .nullable()
     .optional()
-    .nullable(),
+    .transform((val) => val ?? null),
 });
