@@ -61,7 +61,7 @@ export const PostCard = ({
 
   const createdAt = post.author.createdAt.toUTCString().split(" ");
   return (
-    <li className="p-4 flex gap-4 border border-border rounded-xl mb-2 relative w-full">
+    <li className="p-4 flex gap-4 border border-border rounded-xl mb-2 last:mb-0 relative w-full">
       <PostAvatar
         setIsFollowing={(isFollowed) =>
           setPost((prev) => ({

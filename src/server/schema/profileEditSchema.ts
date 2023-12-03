@@ -32,5 +32,9 @@ export const profileEditSchema = z.object({
     .max(200, "Bio is too long.")
     .nullable()
     .optional()
-    .transform((val) => val ?? null),
+    .transform((val) => {
+      if (typeof val === "undefined") return undefined;
+
+      return val ?? null;
+    }),
 });

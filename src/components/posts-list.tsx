@@ -44,7 +44,7 @@ export const InfinitePostsList = ({
           label={`Loading${isFetchingNextPage ? " more" : ""} posts...`}
         />
       ) : hasNextPage ? null : (
-        <div className="h-20 w-full flex items-center justify-center text-muted-foreground text-sm">
+        <div className="h-20 w-full flex items-center justify-center text-muted-foreground text-sm -mt-6">
           No posts left to show
         </div>
       )}
@@ -81,7 +81,7 @@ export const PostsList = ({
   }, [onEnd]);
 
   return posts.length ? (
-    <ul className="my-6 w-full">
+    <ul className="mb-6 w-full">
       {posts.map((post) => (
         <PostCard
           deletePost={() => deletePost(post.id)}

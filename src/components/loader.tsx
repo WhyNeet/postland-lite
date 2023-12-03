@@ -9,7 +9,7 @@ export const PostsLoader = forwardRef<
   return (
     <div
       className={cn(
-        "h-32 w-full flex items-center justify-center gap-2",
+        "h-20 w-full flex items-center justify-center gap-2 -mt-6",
         className
       )}
       ref={ref}

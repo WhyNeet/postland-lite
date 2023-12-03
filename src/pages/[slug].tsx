@@ -88,7 +88,7 @@ export default function User({
       </Head>
       <div className="min-h-screen w-screen flex items-center flex-col pt-[20vh] px-5 sm:px-10 lg:px-20 max-w-7xl mx-auto">
         <Logo className="text-xl mb-10" />
-        <div className="flex items-stretch justify-stretch gap-2 w-full flex-col lg:flex-row">
+        <div className="flex items-stretch justify-stretch gap-2 w-full flex-col lg:flex-row mb-2">
           <UserCard sessionUser={user} isEditable={isCurrentUser} />
           <Bio user={user} isEditable={isCurrentUser} />
         </div>
@@ -231,7 +231,7 @@ export const Bio = ({
   };
 
   return (
-    <HoverCard className="w-full card">
+    <HoverCard className="w-full card group">
       {isEditable ? (
         <Button
           onClick={() => {
@@ -240,11 +240,11 @@ export const Bio = ({
           }}
           size="icon"
           variant="ghost"
-          className="absolute top-2 right-2 backdrop-blur"
+          className="absolute top-2 right-2 backdrop-blur group-hover:opacity-100 opacity-0 transition-all"
           disabled={isLoading}
         >
           {isLoading ? (
-            <Spinner />
+            <Spinner className="h-5 w-5" />
           ) : isEditing ? (
             <CheckIcon />
           ) : (

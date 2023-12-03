@@ -2,21 +2,11 @@ import { Button } from "@/components/ui/button";
 import { CrazyLogo } from "@/components/ui/logo";
 import { ProviderLogo } from "@/components/logos";
 import Head from "next/head";
-import { ClientSafeProvider, getProviders, signIn } from "next-auth/react";
-import { GetServerSideProps } from "next";
+import { signIn } from "next-auth/react";
 
-export const getServerSideProps = (async (context) => {
-  const providers = await getProviders();
-  return { props: { providers: Object.values(providers!) } };
-}) satisfies GetServerSideProps<{
-  providers: ClientSafeProvider[];
-}>;
+export default function LogIn() {
+  const providers: string[] = ["Google"];
 
-export default function LogIn({
-  providers,
-}: {
-  providers: ClientSafeProvider[];
-}) {
   return (
     <>
       <Head>
@@ -34,11 +24,11 @@ export default function LogIn({
           <Button
             variant="outline"
             className="w-64 mb-2 flex items-center gap-2"
-            key={provider.id}
-            onClick={() => signIn(provider.id, { callbackUrl: "/" })}
+            key={provider}
+            onClick={() => signIn(provider.toLowerCase(), { callbackUrl: "/" })}
           >
-            <ProviderLogo name={provider.name} className="h-4 w-4" />
-            {provider.name}
+            <ProviderLogo name={provider} className="h-4 w-4" />
+            {provider}
           </Button>
         ))}
       </div>

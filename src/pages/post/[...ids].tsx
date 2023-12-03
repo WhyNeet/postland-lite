@@ -1,11 +1,11 @@
-import { appRouter } from "@/server/routers/_app";
-import { transformer } from "@/utils/transformer";
+// import { appRouter } from "@/server/routers/_app";
+// import { transformer } from "@/utils/transformer";
 import { trpc } from "@/utils/trpc";
-import { createServerSideHelpers } from "@trpc/react-query/server";
+// import { createServerSideHelpers } from "@trpc/react-query/server";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]";
-import { prisma } from "@/utils/prisma";
+// import { prisma } from "@/utils/prisma";
 import { NavBar } from "@/components/navbar";
 import Head from "next/head";
 import { CreatePost } from "@/components/create-post";
@@ -15,6 +15,7 @@ import { InfinitePostsList } from "@/components/posts-list";
 import { useRouter } from "next/router";
 import { PostCard } from "@/components/post-card";
 import { useEffect } from "react";
+import { PostsLoader } from "@/components/loader";
 
 export async function getServerSideProps({
   query,
@@ -25,23 +26,23 @@ export async function getServerSideProps({
 
   const rootPostId = query.ids!.at(-1)!;
 
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    transformer,
-    ctx: { prisma, session },
-  });
+  // const helpers = createServerSideHelpers({
+  //   router: appRouter,
+  //   transformer,
+  //   ctx: { prisma, session },
+  // });
 
-  await helpers.post.getList.prefetch({
-    cursor: 0,
-    take: 20,
-    rootPost: rootPostId,
-  });
+  // await helpers.post.getList.prefetchInfinite({
+  //   cursor: 0,
+  //   take: 20,
+  //   rootPost: rootPostId,
+  // });
 
-  await helpers.post.getById.prefetch({ id: rootPostId });
+  // await helpers.post.getById.prefetch({ id: rootPostId });
 
   return {
     props: {
-      trpcState: helpers.dehydrate(),
+      // trpcState: helpers.dehydrate(),
       user: session?.user ?? null,
       rootPostId,
     },
@@ -54,7 +55,11 @@ export default function PostFeed({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
 
-  const { data: rootPost, refetch: refetchRoot } = trpc.post.getById.useQuery({
+  const {
+    data: rootPost,
+    isLoading: isLoadingRoot,
+    isError: isErrorRoot,
+  } = trpc.post.getById.useQuery({
     id: router.query.ids ? router.query.ids.at(-1)! : rootPostId,
   });
 
@@ -80,9 +85,22 @@ export default function PostFeed({
     }
   );
 
-  useEffect(() => {
-    if (isError || !rootPost) router.replace("/");
-  }, [posts, isError, rootPost, router]);
+  if (!isLoadingRoot && !rootPost)
+    return (
+      <div className="h-screen w-screen flex items-center justify-center flex-col">
+        <h1 className="text-3xl font-bold">Cannot find this post.</h1>
+        <p className="text-sm text-muted-foreground">
+          Failed to find a post with this id.{" "}
+          <Link
+            href="/"
+            className={buttonVariants({ variant: "link" })}
+            style={{ padding: 0 }}
+          >
+            Homepage
+          </Link>
+        </p>
+      </div>
+    );
 
   return (
     <div>
@@ -91,11 +109,15 @@ export default function PostFeed({
       </Head>
       <NavBar user={user} />
       <div className="px-5 sm:px-10 lg:px-20 py-24 max-w-7xl mx-auto">
-        <PostCard
-          post={rootPost!}
-          deletePost={() => router.replace("/")}
-          userId={user?.id ?? null}
-        />
+        {isLoadingRoot ? (
+          <PostsLoader label="Loading..." />
+        ) : (
+          <PostCard
+            post={rootPost!}
+            deletePost={() => router.replace("/")}
+            userId={user?.id ?? null}
+          />
+        )}
         <div className="h-6 w-full"></div>
         {user ? (
           <CreatePost replyTo={rootPostId} user={user} onCreate={refetch} />

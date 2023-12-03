@@ -34,7 +34,7 @@ export const CreatePost = ({
   });
 
   return (
-    <div className="w-full border-b border-b-border pb-2 flex">
+    <div className="w-full border-b border-b-border pb-2 flex mb-6">
       <AccountButton user={user} className="mr-4" />
       <div className="w-full">
         <TextArea

@@ -22,6 +22,7 @@ import { object } from "@/utils/validation";
 import { useToast } from "./ui/use-toast";
 import { cn } from "@/utils";
 import { Session } from "next-auth";
+import { useRouter } from "next/router";
 
 export const ProfileEditDialog = ({
   user,
@@ -30,6 +31,7 @@ export const ProfileEditDialog = ({
   updatePreview?: (data: z.infer<typeof profileEditSchema>) => void;
   user: Session["user"];
 }) => {
+  const router = useRouter();
   const { toast } = useToast();
 
   const { mutateAsync: updateUserAsync, isLoading } =
@@ -80,11 +82,12 @@ export const ProfileEditDialog = ({
   const onSubmit: SubmitHandler<z.infer<typeof profileEditSchema>> = async (
     data
   ) => {
-    console.log("update");
-    await updateUserAsync(data)
+    await updateUserAsync({ ...data, bio: undefined })
       .then(() => {
         setIsOpen(false);
         updatePreview?.(data);
+        if (user.username !== data.username)
+          router.replace("/@" + data.username);
       })
       .catch(() => console.log("an error occured."));
   };

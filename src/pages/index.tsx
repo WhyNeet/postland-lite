@@ -1,7 +1,7 @@
 import { NavBar } from "@/components/navbar";
 import Head from "next/head";
 import { InfinitePostsList } from "@/components/posts-list";
-import { text } from "@/components/ui/typography";
+// import { text } from "@/components/ui/typography";
 import { trpc } from "@/utils/trpc";
 import { CreatePost } from "@/components/create-post";
 import {
@@ -10,10 +10,10 @@ import {
 } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import { appRouter } from "@/server/routers/_app";
-import { prisma } from "@/utils/prisma";
-import { transformer } from "@/utils/transformer";
+// import { createServerSideHelpers } from "@trpc/react-query/server";
+// import { appRouter } from "@/server/routers/_app";
+// import { prisma } from "@/utils/prisma";
+// import { transformer } from "@/utils/transformer";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -23,22 +23,25 @@ export async function getServerSideProps({
 }: GetServerSidePropsContext) {
   const session = await getServerSession(req, res, authOptions);
 
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    ctx: { session, prisma },
-    transformer,
-  });
+  // const helpers = createServerSideHelpers({
+  //   router: appRouter,
+  //   ctx: { session, prisma },
+  //   transformer,
+  // });
 
-  await helpers.post.getList.prefetchInfinite(
-    {
-      cursor: 0,
-      take: 20,
-    },
-    { context: { session, prisma } }
-  );
+  // await helpers.post.getList.prefetchInfinite(
+  //   {
+  //     cursor: 0,
+  //     take: 20,
+  //   },
+  //   { context: { session, prisma } }
+  // );
 
   return {
-    props: { user: session?.user ?? null, trpcState: helpers.dehydrate() },
+    props: {
+      user: session?.user ?? null,
+      // trpcState: helpers.dehydrate(),
+    },
   };
 }
 
