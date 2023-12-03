@@ -74,7 +74,7 @@ export const CreatePost = ({
               }
             >
               {isLoading ? (
-                <Spinner className="h-5 w-5" />
+                <Spinner className="h-5 w-5 text-primary-foreground" />
               ) : isDraft ? (
                 "Draft"
               ) : (

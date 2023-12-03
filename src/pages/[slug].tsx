@@ -112,6 +112,7 @@ const UserPostsList = ({
     refetch,
     fetchNextPage,
     isFetchingNextPage,
+    isLoading,
     hasNextPage,
     isError,
   } = trpc.post.getList.useInfiniteQuery(
@@ -135,11 +136,12 @@ const UserPostsList = ({
       <InfinitePostsList
         fetchNextPage={fetchNextPage}
         hasNextPage={hasNextPage}
+        isLoading={isLoading}
         isFetchingNextPage={isFetchingNextPage}
         posts={posts as any}
         withReplies
         refetch={refetch}
-        userId={user?.id ?? null}
+        userId={userId}
       />
     </div>
   );

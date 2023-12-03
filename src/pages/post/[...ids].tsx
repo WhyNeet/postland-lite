@@ -63,6 +63,7 @@ export default function PostFeed({
     refetch,
     fetchNextPage,
     isFetchingNextPage,
+    isLoading,
     hasNextPage,
     isError,
   } = trpc.post.getList.useInfiniteQuery(
@@ -118,6 +119,7 @@ export default function PostFeed({
           isFetchingNextPage={isFetchingNextPage}
           posts={posts as any}
           refetch={refetch}
+          isLoading={isLoading}
           userId={user?.id ?? null}
         />
       </div>

@@ -50,6 +50,7 @@ export default function Home({
     refetch,
     fetchNextPage,
     isFetchingNextPage,
+    isLoading,
     hasNextPage,
   } = trpc.post.getList.useInfiniteQuery(
     { take: 20 },
@@ -90,6 +91,7 @@ export default function Home({
           hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
           posts={posts as any}
+          isLoading={isLoading}
           refetch={refetch}
           userId={user?.id ?? null}
         />

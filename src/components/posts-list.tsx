@@ -17,6 +17,7 @@ export const InfinitePostsList = ({
   fetchNextPage,
   hasNextPage,
   isFetchingNextPage,
+  isLoading,
 }: {
   userId: string | null;
   withReplies?: boolean;
@@ -25,6 +26,7 @@ export const InfinitePostsList = ({
   fetchNextPage: () => void;
   hasNextPage: boolean | undefined;
   isFetchingNextPage: boolean;
+  isLoading: boolean;
 }) => {
   return (
     <>
@@ -37,8 +39,10 @@ export const InfinitePostsList = ({
           onEnd={() => (hasNextPage ? fetchNextPage() : null)}
         />
       )}
-      {isFetchingNextPage ? (
-        <PostsLoader label="Loading more..." />
+      {isFetchingNextPage || isLoading ? (
+        <PostsLoader
+          label={`Loading${isFetchingNextPage ? " more" : ""} posts...`}
+        />
       ) : hasNextPage ? null : (
         <div className="h-20 w-full flex items-center justify-center text-muted-foreground text-sm">
           No posts left to show
@@ -89,9 +93,5 @@ export const PostsList = ({
       ))}
       <span ref={end} />
     </ul>
-  ) : (
-    <div className="h-32 w-full flex items-center justify-center text-muted-foreground text-sm">
-      You are first to post here!
-    </div>
-  );
+  ) : null;
 };

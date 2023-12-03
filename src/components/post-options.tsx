@@ -54,7 +54,9 @@ export const PostOptions = ({
         >
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={deletePost}>Delete</DropdownMenuItem>
+        <DropdownMenuItem onClick={deletePost} disabled={isLoading}>
+          Delete
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
