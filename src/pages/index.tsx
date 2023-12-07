@@ -14,8 +14,7 @@ import { authOptions } from "./api/auth/[...nextauth]";
 // import { appRouter } from "@/server/routers/_app";
 // import { prisma } from "@/utils/prisma";
 // import { transformer } from "@/utils/transformer";
-import { buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
+import { LoginPrompt } from "@/components/login-prompt";
 
 export async function getServerSideProps({
   req,
@@ -73,22 +72,7 @@ export default function Home({
       </Head>
       <NavBar user={user} />
       <div className="px-5 sm:px-10 lg:px-20 py-24 max-w-7xl mx-auto">
-        {user ? (
-          <CreatePost user={user} onCreate={refetch} />
-        ) : (
-          <div className="p-4 border border-border rounded-xl bg-secondary flex">
-            <div>
-              <div className="font-semibold">You are not logged in.</div>
-              <p className="text-sm text-muted-foreground">
-                Log in to start posting.
-              </p>
-            </div>
-            <span className="flex-1" />
-            <Link href="/auth/log-in" className={buttonVariants()}>
-              Log in
-            </Link>
-          </div>
-        )}
+        {user ? <CreatePost user={user} onCreate={refetch} /> : <LoginPrompt />}
         <InfinitePostsList
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}

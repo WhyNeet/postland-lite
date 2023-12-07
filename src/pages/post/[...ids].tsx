@@ -1,11 +1,7 @@
-// import { appRouter } from "@/server/routers/_app";
-// import { transformer } from "@/utils/transformer";
 import { trpc } from "@/utils/trpc";
-// import { createServerSideHelpers } from "@trpc/react-query/server";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]";
-// import { prisma } from "@/utils/prisma";
 import { NavBar } from "@/components/navbar";
 import Head from "next/head";
 import { CreatePost } from "@/components/create-post";
@@ -14,8 +10,8 @@ import Link from "next/link";
 import { InfinitePostsList } from "@/components/posts-list";
 import { useRouter } from "next/router";
 import { PostCard } from "@/components/post-card";
-import { useEffect } from "react";
 import { PostsLoader } from "@/components/loader";
+import { LoginPrompt } from "@/components/login-prompt";
 
 export async function getServerSideProps({
   query,
@@ -122,18 +118,7 @@ export default function PostFeed({
         {user ? (
           <CreatePost replyTo={rootPostId} user={user} onCreate={refetch} />
         ) : (
-          <div className="p-4 border border-border rounded-xl bg-secondary flex">
-            <div>
-              <div className="font-semibold">You are not logged in.</div>
-              <p className="text-sm text-muted-foreground">
-                Log in to start posting.
-              </p>
-            </div>
-            <span className="flex-1" />
-            <Link href="/auth/log-in" className={buttonVariants()}>
-              Log in
-            </Link>
-          </div>
+          <LoginPrompt />
         )}
         <InfinitePostsList
           fetchNextPage={fetchNextPage}
