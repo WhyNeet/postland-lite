@@ -68,7 +68,7 @@
   .card:hover {
     transform: perspective(5000px) rotateY(var(--rotate-y))
       rotateX(var(--rotate-x));
-    
+
       @apply shadow-2xl shadow-primary/10
   }
 
